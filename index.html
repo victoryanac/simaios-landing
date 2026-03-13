@@ -447,8 +447,72 @@
                 <h2>¿Quere recibir información detallada?</h2>
                 <h3> haganos sus consultas</h3>
 
-                <script src="//web.webformscr.com/apps/fc3/build/loader.js" async
-                    sp-form-id="f9a38b2f9b843185a2a9255f109ee36a7bd6040e640ec5ccfd0b59324462065d"></script>
+                <div class="card shadow-sm border-0 p-4 mx-auto w-100" style="max-width: 400px; border-radius: 1rem;">
+                    <!-- Encabezado -->
+                    <div class="text-center mb-4">
+                        <div class="rounded-circle bg-success bg-opacity-10 d-flex align-items-center justify-content-center mx-auto mb-3"
+                            style="width: 60px; height: 60px;">
+                            <i data-lucide="message-circle" class="text-success" style="width: 30px; height: 30px;"></i>
+                        </div>
+                        <h3 class="h5 fw-bold text-dark mb-1">Hablemos por WhatsApp</h3>
+                        <p class="text-secondary small mb-0">Déjanos tus datos y te atenderemos de inmediato.</p>
+                    </div>
+
+                    <!-- Formulario -->
+                    <form id="whatsappForm">
+                        <div class="mb-3">
+                            <label for="nombre" class="form-label text-secondary small fw-bold mb-1">Nombre
+                                completo</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-white border-end-0 text-secondary">
+                                    <i data-lucide="user" style="width: 18px; height: 18px;"></i>
+                                </span>
+                                <input type="text" id="nombre" name="nombre" required
+                                    class="form-control border-start-0 ps-0 focus-ring focus-ring-success"
+                                    placeholder="Ej. Juan Pérez">
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="correo" class="form-label text-secondary small fw-bold mb-1">Correo
+                                electrónico</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-white border-end-0 text-secondary">
+                                    <i data-lucide="mail" style="width: 18px; height: 18px;"></i>
+                                </span>
+                                <input type="email" id="correo" name="correo" required
+                                    class="form-control border-start-0 ps-0 focus-ring focus-ring-success"
+                                    placeholder="tu@correo.com">
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="telefono" class="form-label text-secondary small fw-bold mb-1">Teléfono</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-white border-end-0 text-secondary">
+                                    <i data-lucide="phone" style="width: 18px; height: 18px;"></i>
+                                </span>
+                                <input type="tel" id="telefono" name="telefono" required
+                                    class="form-control border-start-0 ps-0 focus-ring focus-ring-success"
+                                    placeholder="+56 9 1234 5678">
+                            </div>
+                        </div>
+
+                        <button type="submit" id="btnSubmit"
+                            class="btn btn-success w-100 py-2 fw-semibold d-flex justify-content-center align-items-center"
+                            style="border-radius: 0.5rem;">
+                            <i data-lucide="send" class="me-2" style="width: 18px; height: 18px;"></i>
+                            Ir a WhatsApp
+                        </button>
+                    </form>
+
+                    <!-- Mensaje de éxito (oculto por defecto mediante d-none) -->
+                    <div id="successMessage" class="alert alert-success mt-3 d-none text-center small mb-0 py-2"
+                        role="alert">
+                        ¡Datos guardados! Abriendo WhatsApp...
+                    </div>
+                </div>
+
             </div>
         </div>
     </section>
@@ -474,6 +538,68 @@
     <script>
         AOS.init();
     </script>
+    <!-- ICONOS FORMULARIO-->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+
+
+    <!--  * * * * * * * * * * * * * * * * SCRIPT FUNCIONALIDAD FORMULARIO  * * * * * * * * * * * * * * * * -->
+    <script>
+        // Inicializar iconos
+        lucide.createIcons();
+
+        // Tu URL de Google Sheets
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbyeR7llFruU1nQ6qvsA40Us3AcJsmwYPxv2GaHBRpEvnw1SG9m-ynT99OHdFesH7BAu7Q/exec';
+        const form = document.getElementById('whatsappForm');
+
+        form.addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            const btnSubmit = document.getElementById('btnSubmit');
+            const successMsg = document.getElementById('successMessage');
+
+            // Estado de carga (estilo Bootstrap)
+            btnSubmit.disabled = true;
+            btnSubmit.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Guardando...';
+
+            // 1. Enviar a Google Sheets
+            fetch(scriptURL, { method: 'POST', body: new FormData(form), mode: 'no-cors' })
+                .then(response => {
+                    // Mostrar mensaje de éxito usando clase de Bootstrap
+                    successMsg.classList.remove('d-none');
+                    btnSubmit.innerHTML = 'Abriendo WhatsApp...';
+
+                    // 2. Preparar WhatsApp
+                    const nombre = document.getElementById('nombre').value;
+                    const correo = document.getElementById('correo').value;
+                    const telefono = document.getElementById('telefono').value;
+                    const numeroDestino = '56964260153';
+
+                    const mensajeOriginal = `Hola, mi nombre es ${nombre}. Mi correo es ${correo} y mi teléfono es ${telefono}. Me gustaría obtener más información.`;
+                    const mensajeCodificado = encodeURIComponent(mensajeOriginal);
+                    const urlWhatsapp = `https://wa.me/${numeroDestino}?text=${mensajeCodificado}`;
+
+                    // 3. Redirigir y restaurar
+                    setTimeout(() => {
+                        window.open(urlWhatsapp, '_blank');
+                        form.reset();
+                        btnSubmit.disabled = false;
+                        btnSubmit.innerHTML = '<i data-lucide="send" class="me-2" style="width: 18px; height: 18px;"></i> Ir a WhatsApp';
+                        successMsg.classList.add('d-none');
+                        lucide.createIcons();
+                    }, 1500);
+                })
+                .catch(error => {
+                    console.error('Error!', error);
+                    alert('Hubo un error de red, intenta nuevamente.');
+                    btnSubmit.disabled = false;
+                    btnSubmit.innerHTML = '<i data-lucide="send" class="me-2" style="width: 18px; height: 18px;"></i> Ir a WhatsApp';
+                    lucide.createIcons();
+                });
+        });
+    </script>
+
+
 </body>
 
 </html>

@@ -1,0 +1,8 @@
+---
+deployment:
+  tasks:
+    - export DEPLOYPATH=/home4/simaiosc/info.siropedesaviamadalbal.com/
+    # 1. Copiamos todos los archivos del repositorio a la carpeta del subdominio
+    - /bin/cp -R * $DEPLOYPATH
+    # 2. Borramos el archivo de configuración en el destino por seguridad y limpieza
+    - /bin/rm $DEPLOYPATH/.cpanel.yml
